@@ -250,17 +250,52 @@ const ChatBot = () => {
     }
   }
 
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      addUserMessage(inputValue)
-      setInputValue('')
-      
-      // Resposta automática para mensagens livres
+  const handleSendMessage = (messageText = inputValue) => {
+    if (messageText.trim()) {
+      addUserMessage(messageText)
+      setInputValue("")
+
       setTimeout(() => {
-        addBotMessage("Obrigado pela sua mensagem! 😊 Para te ajudar melhor, nossa equipe pode responder dúvidas mais específicas. Enquanto isso, posso te guiar com as opções abaixo:")
-        setTimeout(() => {
-          showFAQOptions()
-        }, 1000)
+        // Lógica para processar a mensagem do usuário
+        // Se o usuário digitou algo, tentar responder com base no contexto atual
+        // ou oferecer opções relevantes.
+        if (currentFlow === "welcome") {
+          // Se ainda estiver no fluxo de boas-vindas, tentar identificar o perfil
+          const lowerCaseMessage = messageText.toLowerCase()
+          if (lowerCaseMessage.includes("missionário")) {
+            handleProfileSelection("missionary")
+          } else if (lowerCaseMessage.includes("mantenedor") || lowerCaseMessage.includes("contribuir")) {
+            handleProfileSelection("supporter")
+          } else if (lowerCaseMessage.includes("curioso") || lowerCaseMessage.includes("geral")) {
+            handleProfileSelection("curious")
+          } else {
+            addBotMessage("Desculpe, não entendi. Por favor, selecione uma das opções ou digite 'recomeçar' para ver as opções de perfil novamente.")
+            setTimeout(() => {
+              showProfileOptions()
+            }, 1000)
+          }
+        } else {
+          // Se já estiver em um fluxo específico, tentar responder a perguntas frequentes
+          const lowerCaseMessage = messageText.toLowerCase()
+          if (lowerCaseMessage.includes("transparência")) {
+            handleFAQ("faq_transparency")
+          } else if (lowerCaseMessage.includes("segurança") || lowerCaseMessage.includes("seguro")) {
+            handleFAQ("faq_security")
+          } else if (lowerCaseMessage.includes("seleção") || lowerCaseMessage.includes("verificados")) {
+            handleFAQ("faq_selection")
+          } else if (lowerCaseMessage.includes("escolher") || lowerCaseMessage.includes("apoiar")) {
+            handleFAQ("faq_choose")
+          } else if (lowerCaseMessage.includes("contato") || lowerCaseMessage.includes("equipe")) {
+            handleFAQ("contact_human")
+          } else if (lowerCaseMessage.includes("recomeçar") || lowerCaseMessage.includes("início")) {
+            handleFAQ("restart")
+          } else {
+            addBotMessage("Obrigado pela sua mensagem! 😊 Para te ajudar melhor, nossa equipe pode responder dúvidas mais específicas. Enquanto isso, posso te guiar com as opções abaixo:")
+            setTimeout(() => {
+              showFAQOptions()
+            }, 1000)
+          }
+        }
       }, 500)
     }
   }
@@ -413,4 +448,3 @@ const ChatBot = () => {
 }
 
 export default ChatBot
-
